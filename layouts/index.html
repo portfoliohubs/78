@@ -26,11 +26,18 @@
     <meta name="theme-color" content="#2563eb">
 
     <meta property="og:type" content="website">
+    {{ $ogImage := $seo.og_image | default "" }}
+    {{ $ogImageURL := "" }}
+    {{ if hasPrefix $ogImage "data:" }}
+      {{ $ogImageURL = $ogImage }}
+    {{ else }}
+      {{ $ogImageURL = $ogImage | absURL }}
+    {{ end }}
     <meta property="og:title" content="{{ if $doctorNameAr }}{{ $doctorNameEn }} | {{ $doctorNameAr }} - {{ $siteName }}{{ else }}{{ $doctorNameEn }} - {{ $siteName }}{{ end }}">
     <meta property="og:description" content="{{ $desc }}">
     <meta property="og:url" content="{{ .Permalink }}">
     <meta property="og:site_name" content="{{ $siteName }}">
-    <meta property="og:image" content="{{ ($seo.og_image | default "") | absURL }}">
+    <meta property="og:image" content="{{ $ogImageURL | safeURL }}">
 
     <meta name="twitter:card" content="summary_large_image">
     {{ if $seo.twitter_handle }}
@@ -38,16 +45,16 @@
     {{ end }}
     <meta name="twitter:title" content="{{ if $doctorNameAr }}{{ $doctorNameEn }} | {{ $doctorNameAr }} - {{ $siteName }}{{ else }}{{ $doctorNameEn }} - {{ $siteName }}{{ end }}">
     <meta name="twitter:description" content="{{ $desc }}">
-    <meta name="twitter:image" content="{{ ($seo.og_image | default "") | absURL }}">
+    <meta name="twitter:image" content="{{ $ogImageURL | safeURL }}">
 
     {{ $favicon := $seo.favicon_image | default "" }}
     {{ if eq $favicon "" }}
       {{ $favicon = .Site.Params.hero.profile_image | default "" }}
     {{ end }}
     {{ if ne $favicon "" }}
-    <link rel="icon" href="{{ $favicon }}" sizes="any">
-    <link rel="shortcut icon" href="{{ $favicon }}">
-    <link rel="apple-touch-icon" href="{{ $favicon }}">
+    <link rel="icon" href="{{ $favicon | safeURL }}" sizes="any">
+    <link rel="shortcut icon" href="{{ $favicon | safeURL }}">
+    <link rel="apple-touch-icon" href="{{ $favicon | safeURL }}">
     {{ end }}
 
     {{ with .Site.Params.integrations.google_search_console_verification }}
@@ -68,7 +75,7 @@
     {{ end }}
     {{ end }}
 
-    {{ $schema := dict "@context" "https://schema.org" "@type" (slice "Dentist" "LocalBusiness") "name" $doctorNameEn "url" .Permalink "image" (($seo.og_image | default "") | absURL) "telephone" (.Site.Params.contact.phone | default "") "email" (.Site.Params.contact.email | default "") "sameAs" (slice (.Site.Params.contact.instagram | default "") (.Site.Params.contact.facebook | default "") (.Site.Params.contact.linkedin | default "")) }}
+    {{ $schema := dict "@context" "https://schema.org" "@type" (slice "Dentist" "LocalBusiness") "name" $doctorNameEn "url" .Permalink "image" $ogImageURL "telephone" (.Site.Params.contact.phone | default "") "email" (.Site.Params.contact.email | default "") "sameAs" (slice (.Site.Params.contact.instagram | default "") (.Site.Params.contact.facebook | default "") (.Site.Params.contact.linkedin | default "")) }}
     <script type="application/ld+json">{{ $schema | jsonify }}</script>
     
     <!-- Font Awesome -->
@@ -1127,7 +1134,7 @@
             <div class="hero-content">
                 <div class="profile-image-container">
                     <img 
-                        src="{{ .Site.Params.hero.profile_image }}" 
+                        src="{{ .Site.Params.hero.profile_image | safeURL }}" 
                         alt="{{ .Site.Params.hero.profile_image_alt }}"
                         data-alt-en="{{ .Site.Params.hero.profile_image_alt }}"
                         data-alt-ar="{{ .Site.Params.ar.hero.profile_image_alt }}"
@@ -1309,7 +1316,7 @@
                                 {{ range .cases }}
                                     <div class="case-card">
                                         <div class="case-image-wrapper single">
-                                            <img src="{{ .photo }}" alt="{{ .alt | default .description }}" data-alt-en="{{ .alt | default .description }}" data-alt-ar="{{ .alt_ar | default (.alt | default .description) }}" class="case-image" loading="lazy">
+                                            <img src="{{ .photo | safeURL }}" alt="{{ .alt | default .description }}" data-alt-en="{{ .alt | default .description }}" data-alt-ar="{{ .alt_ar | default (.alt | default .description) }}" class="case-image" loading="lazy">
                                         </div>
                                         <div class="case-description">
                                             <p data-en="{{ .description }}" data-ar="{{ .description_ar | default .description }}">{{ .description }}</p>
